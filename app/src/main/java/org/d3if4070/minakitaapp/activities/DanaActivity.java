@@ -44,9 +44,9 @@ import org.d3if4070.minakitaapp.fragments.CrowdfundingFragment;
 import org.d3if4070.minakitaapp.fragments.HomeFragment;
 import org.d3if4070.minakitaapp.fragments.ProfileFragment;
 import org.d3if4070.minakitaapp.fragments.SettingsFragment;
-import org.d3if4070.minakitaapp.model.Post;
+import org.d3if4070.minakitaapp.model.PostDana;
 
-public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class DanaActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int PReqCode = 2 ;
     private static final int REQUESCODE = 2 ;
@@ -61,13 +61,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home2);
-
+        setContentView(R.layout.activity_dana);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // ini
+
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
@@ -85,7 +85,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_dana);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -97,15 +97,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         updateNavHeader();
 
-
         // set the home fragment as the default one
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.container,new HomeFragment()).commit();
-
-
-
+        getSupportFragmentManager().beginTransaction().replace(R.id.container,new CrowdfundingFragment()).commit();
     }
-
     private void setupPopupImageClick() {
 
 
@@ -126,21 +121,19 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     }
 
-
     private void checkAndRequestForPermission() {
 
-
-        if (ContextCompat.checkSelfPermission(Home.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (ContextCompat.checkSelfPermission(DanaActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(Home.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(DanaActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
-                Toast.makeText(Home.this,"Please accept for required permission",Toast.LENGTH_SHORT).show();
+                Toast.makeText(DanaActivity.this,"Please accept for required permission",Toast.LENGTH_SHORT).show();
 
             }
 
             else
             {
-                ActivityCompat.requestPermissions(Home.this,
+                ActivityCompat.requestPermissions(DanaActivity.this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         PReqCode);
             }
@@ -151,11 +144,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             openGallery();
 
     }
-
-
-
-
-
     private void openGallery() {
         //TODO: open gallery intent and wait for user to pick an image !
 
@@ -163,8 +151,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         galleryIntent.setType("image/*");
         startActivityForResult(galleryIntent,REQUESCODE);
     }
-
-
 
     // when user picked an image ...
     @Override
@@ -179,11 +165,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             popupPostImage.setImageURI(pickedImgUri);
 
         }
-
-
     }
-
-
 
     private void iniPopup() {
 
@@ -204,7 +186,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         // load Current user profile photo
 
-        Glide.with(Home.this).load(currentUser.getPhotoUrl()).into(popupUserImage);
+        Glide.with(DanaActivity.this).load(currentUser.getPhotoUrl()).into(popupUserImage);
 
 
         // Add Post click Listener
@@ -227,7 +209,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                     // TODO Create Post Object and add it to firebase database
                     // first we need to upload Post Image
                     // access firebase storage
-                    StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("blog_images");
+                    StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("dana_images");
                     final StorageReference imageFilePath = storageReference.child(pickedImgUri.getLastPathSegment());
                     imageFilePath.putFile(pickedImgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
@@ -238,7 +220,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 public void onSuccess(Uri uri) {
                                     String imageDownlaodLink = uri.toString();
                                     // create Post Object
-                                    Post post = new Post(popupTitle.getText().toString(),
+                                    PostDana post = new PostDana(popupTitle.getText().toString(),
                                             popupDescription.getText().toString(),
                                             popupDana.getText().toString(),
                                             imageDownlaodLink,
@@ -275,15 +257,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
     }
-
-    private void addPost(Post post) {
+    private void addPost(PostDana post) {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("Posts").push();
+        DatabaseReference myRef = database.getReference("PostsDana").push();
 
         // get Post unique ID and upadte Post key
         String key = myRef.getKey();
-        post.setPostKey(key);
+        post.setPostKeyDana(key);
 
 
         // add Post data to firebase database
@@ -301,13 +282,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     private void showMessage(String message) {
 
-        Toast.makeText(Home.this,message,Toast.LENGTH_LONG).show();
+        Toast.makeText(DanaActivity.this,message,Toast.LENGTH_LONG).show();
 
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_dana);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -338,6 +319,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -373,7 +355,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_dana);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -395,6 +377,5 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         Glide.with(this).load(currentUser.getPhotoUrl()).into(navUserPhot);
 
     }
-
 
 }

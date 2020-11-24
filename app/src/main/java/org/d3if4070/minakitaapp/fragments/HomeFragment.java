@@ -96,8 +96,6 @@ public class HomeFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        // Get List Posts from the database
-
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

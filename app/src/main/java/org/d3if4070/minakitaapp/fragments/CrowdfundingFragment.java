@@ -1,14 +1,30 @@
 package org.d3if4070.minakitaapp.fragments;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.d3if4070.minakitaapp.R;
+import org.d3if4070.minakitaapp.adapter.PostDanaAdapter;
+import org.d3if4070.minakitaapp.model.PostDana;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +37,16 @@ public class CrowdfundingFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+
+    private OnFragmentInteractionListener mListener;
+
+
+    RecyclerView postRecyclerView ;
+    PostDanaAdapter postDanaAdapter ;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference ;
+    List<PostDana> postListDana;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -60,7 +86,69 @@ public class CrowdfundingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_crowdfunding, container, false);
+        View fragmentView = inflater.inflate(R.layout.fragment_crowdfunding, container, false);
+        postRecyclerView  = fragmentView.findViewById(R.id.postRVdana);
+        postRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        postRecyclerView.setHasFixedSize(true);
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("PostsDana");
+        return fragmentView ;
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                postListDana = new ArrayList<>();
+                for (DataSnapshot postsnap: dataSnapshot.getChildren()) {
+
+                    PostDana postDana = postsnap.getValue(PostDana.class);
+                    postListDana.add(postDana) ;
+
+
+
+                }
+
+                postDanaAdapter = new PostDanaAdapter(getActivity(),postListDana);
+                postRecyclerView.setAdapter(postDanaAdapter);
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
     }
 }
